@@ -15,10 +15,10 @@ class Location:
         self.exits = exits
 
     def has_entity(self):
-        return self.__entity is None
+        return self.entity is None
 
     def tick(self):
-        self.__entity.tick()
+        self.entity.tick()
 
 
 class Cafeteria(Location):
@@ -81,7 +81,7 @@ first_floor = Location("Первый этаж", 1)
 cafeteria = Cafeteria()
 
 # Now link all of the locations together
-basement.populate_exits([first_floor])
-cafeteria.populate_exits([first_floor])
-first_floor.populate_exits([basement, cafeteria])
+basement.exits = [first_floor]
+cafeteria.exits = [first_floor]
+first_floor.exits = [basement, cafeteria]
 
