@@ -10,58 +10,58 @@ class Consumed(Exception):
 class Item:
     def __init__(self, name, description, damage: Damage, heal: int, slot: str, rarity: str, price: int,
                  consumable: bool, after_death=False, special_behavior=None, cancel_behavior=None):
-        self.__name = name
-        self.__description = description
-        self.__damage = damage
-        self.__heal = heal
-        self.__slot = slot
-        self.__rarity = rarity
-        self.__price = price
-        self.__consumable = consumable
-        self.__after_death = after_death
-        self.__behavior = special_behavior
-        self.__cancel_behavior = cancel_behavior
+        self.name = name
+        self.description = description
+        self.damage = damage
+        self.heal = heal
+        self.slot = slot
+        self.rarity = rarity
+        self.price = price
+        self.consumable = consumable
+        self.after_death = after_death
+        self.behavior = special_behavior
+        self.cancel_behavior = cancel_behavior
 
-    def get_name(self):
-        return self.__name
-
-    def get_description(self):
-        return self.__description
-
-    def get_damage(self):
-        return self.__damage
-
-    def get_heal(self):
-        return self.__heal
-
-    def get_slot(self):
-        return self.__slot
-
-    def get_rarity(self):
-        return self.__rarity
-
-    def get_price(self):
-        return self.__price
-
-    def is_used_after_death(self):
-        return self.__after_death
-
-    def is_consumable(self):
-        return self.__consumable
+    # def get_name(self):
+    #     return self.name
+    #
+    # def get_description(self):
+    #     return self.description
+    #
+    # def get_damage(self):
+    #     return self.damage
+    #
+    # def get_heal(self):
+    #     return self.heal
+    #
+    # def get_slot(self):
+    #     return self.slot
+    #
+    # def get_rarity(self):
+    #     return self.rarity
+    #
+    # def get_price(self):
+    #     return self.price
+    #
+    # def is_used_after_death(self):
+    #     return self.after_death
+    #
+    # def is_consumable(self):
+    #     return self.consumable
 
     def apply_behavior(self, target=None):
-        self.__behavior(target)
+        self.behavior(target)
 
     # Destruction of consumables is handled by user
     def use(self, target):
-        target.damage(self.__damage)
-        target.heal(self.__heal)
+        target.damage(self.damage)
+        target.heal(self.heal)
         self.apply_behavior(target)
-        if self.__consumable:
+        if self.consumable:
             raise Consumed
 
     def unuse(self, target):
-        self.__cancel_behavior(target)
+        self.cancel_behavior(target)
 
 
 # Declare the items
