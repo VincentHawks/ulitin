@@ -14,43 +14,51 @@ class Entity:
     def __init__(self, name, level, attack: Damage, abilities: list, health: int, resists: Resists):
         self.name = name
         self.level = level
-        self.attack = attack
+        self.damage = attack
         self.abilities = abilities
         self.health_constraint = health
         self.health = health
         self.resists = resists
-        self.active_abilities = []
+        self.active_abilities = []  # As in "currently activated"
 
     def add_resists(self, resists: Resists):
-        self.resists.set_math(self.resists.get_math() + resists.get_math())
-        self.resists.set_phys(self.resists.get_phys() + resists.get_phys())
-        self.resists.set_phil(self.resists.get_phil() + resists.get_phil())
-        self.resists.set_prog(self.resists.get_prog() + resists.get_prog())
+        self.resists.math += resists.math
+        self.resists.phys += resists.phys
+        self.resists.phil += resists.phil
+        self.resists.prog += resists.prog
 
-    def subtrat_resists(self, resists: Resists):
-        self.resists.set_math(self.resists.get_math() - resists.get_math())
-        self.resists.set_phys(self.resists.get_phys() - resists.get_phys())
-        self.resists.set_phil(self.resists.get_phil() - resists.get_phil())
-        self.resists.set_prog(self.resists.get_prog() - resists.get_prog())
+    def subtract_resists(self, resists: Resists):
+        self.resists.math -= resists.math
+        self.resists.phys -= resists.phys
+        self.resists.phil -= resists.phil
+        self.resists.prog -= resists.prog
 
     def attack(self, target):
-        return target.damage(self.attack)
+        return target.hurt(self.damage)
 
-    def damage(self, damage: Damage):
-        effective_damage = int(damage.get_math() * (1 - self.resists.get_math() if self.resists.get_math() <= 1 else 0) +
-                               damage.get_phys() * (1 - self.resists.get_phys() if self.resists.get_phys() <= 1 else 0) +
-                               damage.get_phil() * (1 - self.resists.get_phil() if self.resists.get_phil() <= 1 else 0) +
-                               damage.get_prog() * (1 - self.resists.get_prog() if self.resists.get_prog() <= 1 else 0) +
-                               damage.get_abs())
+    def hurt(self, damage: Damage):
+        # Negative damage is possible in some cases
+        effective_damage = int((damage.math * (1 - self.resists.math if self.resists.math <= 1 else 0) if damage.math > 0 else 0) +
+                               (damage.phys * (1 - self.resists.phys if self.resists.phys <= 1 else 0) if damage.phys > 0 else 0) +
+                               (damage.phil * (1 - self.resists.phil if self.resists.phil <= 1 else 0) if damage.phil > 0 else 0) +
+                               (damage.prog * (1 - self.resists.prog if self.resists.prog <= 1 else 0) if damage.prog > 0 else 0) +
+                               damage.abs if damage.abs > 0 else 0)
         self.health -= effective_damage
         if self.health <= 0:
+            # Force cancel all active abilities
+            for ability in self.active_abilies:
+                ability.cancel_behavior(ability.target);
             raise Dead
         return effective_damage
 
     def heal(self, amount):
         self.health += amount
+        # Protection from overhealing
         if self.health > self.health_constraint:
             self.health = self.health_constraint
+
+    # Calling order:
+    # Entity.tick() -> Ability.use() -> Entity.activate_ability()
 
     def activate_ability(self, index: int):
         ability = self.abilities[index]
@@ -60,11 +68,12 @@ class Entity:
     def tick(self):
         for ability in self.abilities:
             ability.tick()
+
         for ability in self.active_abilities:
             if ability.get_duration() == 0:
                 self.active_abilities.remove(ability)
             else:
-                ability.use()
+                ability.use(self)
 
 
 class InventoryFull(Exception):
@@ -99,7 +108,7 @@ class Player(Entity):
         else:
             # If neither - something went terribly wrong
             raise ValueError
-        slot = item_object.get_slot()
+        slot = item_object.slot
 
         # Check if wearable (i.e. passive - does not require to be called or updated)
         # If something is in the necessary slot, cancel its behavior first and push it back to the inventory
@@ -109,22 +118,22 @@ class Player(Entity):
                 self.head.unuse(self)
                 self.items.append(self.head)
             self.head = item_object
-            print("Вы надели на голову", item_object.get_name())
+            print("Вы надели на голову", item_object.name)
         elif slot is 'hand':
             if self.hand is not None:
                 self.hand.unuse(self)
                 self.items.append(self.hand)
             self.hand = item_object
-            print("Вы взяли в руку", item_object.get_name())
+            print("Вы взяли в руку", item_object.name)
         elif slot is 'body':
             if self.body is not None:
                 self.body.unuse(self)
                 self.items.append(self.body)
             self.body = item_object
-            print("Вы надели", item_object.get_name())
+            print("Вы надели", item_object.name)
         else:
             # If it does not occupy any slots - simply use it
-            print("Вы использовали ", item_object.get_name())
+            print("Вы использовали ", item_object.name)
         try:
             # Now apply the effects
             item_object.use(self)
@@ -160,7 +169,7 @@ class Player(Entity):
         self.items.remove(item_object)
 
     def attack(self, target):
-        rv = target.damage(self.attack)
+        rv = target.hurt(self.attack)
         if self.head is glasses:
             self.heal(rv / 2)
         return rv
@@ -168,13 +177,14 @@ class Player(Entity):
     def levelup(self):
         self.level += 1
         self.health_constraint += 10
-        self.attack().set_phys(self.attack.get_phys() + 15)
+        self.attack.phys = self.attack.phys + 15
 
 
 # Nobody should mess with the entity pool
-# убирать тут черточки или нет хуй проссышь
 __entity_pool = [list() for i in range(4)]
 # TODO fill up with desired entities manually
+
+
 
 
 def random_entity(level: int) -> Entity:

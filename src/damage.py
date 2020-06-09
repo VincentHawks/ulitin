@@ -1,3 +1,4 @@
+# Essentially just commonly used parameter objects
 class Damage:
 
     def __init__(self, phys: int, math: int, phil: int, prog: int, absolute=0):
@@ -5,7 +6,7 @@ class Damage:
         self.math = math
         self.phil = phil
         self.prog = prog
-        self.absolute = absolute
+        self.abs = absolute
 
 
 class Resists:

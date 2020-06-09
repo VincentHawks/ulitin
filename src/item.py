@@ -22,39 +22,12 @@ class Item:
         self.behavior = special_behavior
         self.cancel_behavior = cancel_behavior
 
-    # def get_name(self):
-    #     return self.name
-    #
-    # def get_description(self):
-    #     return self.description
-    #
-    # def get_damage(self):
-    #     return self.damage
-    #
-    # def get_heal(self):
-    #     return self.heal
-    #
-    # def get_slot(self):
-    #     return self.slot
-    #
-    # def get_rarity(self):
-    #     return self.rarity
-    #
-    # def get_price(self):
-    #     return self.price
-    #
-    # def is_used_after_death(self):
-    #     return self.after_death
-    #
-    # def is_consumable(self):
-    #     return self.consumable
-
     def apply_behavior(self, target=None):
         self.behavior(target)
 
     # Destruction of consumables is handled by user
     def use(self, target):
-        target.damage(self.damage)
+        target.hurt(self.damage)
         target.heal(self.heal)
         self.apply_behavior(target)
         if self.consumable:
@@ -113,9 +86,9 @@ glasses = Item("Очки зубрилы", "Половина нанесенног
 band = Item("Ободок знаний", "Устойчивость к математическому и программистскому урону +20%",
             Damage(0, 0, 0, 0, 0), 0, 'head', 'rare', 160, False, False,
             band_behavior, band_cancel_behavior)
-hat = Item("Шапочка из фольги", "",
+hat = Item("Шапочка из фольги", "Сопротивление философскому и физическому урону +20%",
            Damage(0, 0, 0, 0, 0), 0, 'head', 'rare', 190, False, False,
            hat_behavior, hat_cancel_behavior)
-card = Item("", "",
+card = Item("Стипендиальная карта", "Уменьшает время восстановления всех способностей на 1",
             Damage(0, 0, 0, 0, 0), 0, 'head', 'epic', 270, False, False,
             card_behavior, card_cancel_behavior)

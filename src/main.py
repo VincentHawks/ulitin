@@ -55,6 +55,20 @@ def main():
     player.move(current_location)
 
     # Game loop
+    # Tick sequence:
+    # 1. Request action
+    # 2. If move to other hub location (i.e. floor) - change location
+    # 3. If move to fight location (i.e. auditory, boss) - fetch entity, enter fight loop
+    # 4. If shop available and requested - shop
+
+    # Fight loop
+    # 0. Set in_fight = True, may not be necessary though
+    # 1. Request and execute player action
+    # 1a. except Dead - player won, give money, break
+    # 2. Select and execute entity action
+    # 2a. except Dead - player lost, break
+    # 3. Tick player
+    # 4. Tick entity
     in_fight = False
     while True:
         print("Текущая локация: ")

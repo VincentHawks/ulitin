@@ -1,9 +1,10 @@
 from src.entity import *
 from src.damage import *
 
+
 class Ability:
     def __init__(self, name: str, description: str, level: int, cooldown: int, damage: Damage, heal: int,
-                 resist: Resists, passive=False, duration = 0, special_behavior=None, cancel_behavior=None):
+                 resist: Resists, passive=False, duration=0, special_behavior=None, cancel_behavior=None):
         self.name = name
         self.description = description
         self.level = level
@@ -20,27 +21,29 @@ class Ability:
         self.cooldown_effect = 0
         self.target = None
 
-    
     # TODO consider rewriting completely
     def tick(self):
         if self.cooldown > 0:
             self.cooldown -= 1
         if self.duration > 0:
             self.duration -= 1
-        if self.duration == 0 and self.passive:
+        if self.duration == 0 and self.passive and:
             self.cooldown = self.cooldown_threshold + 1 + self.cooldown_effect
-            self.stop_behavior()
-
-  
+            self.cancel_behavior(self.target)
 
     # TODO rewrite completely
+    # Although, now that i look at it, is it not fine?
     def use(self, target: Entity):
+        self.target = target
         target.damage(self.damage)
         target.heal(self.heal)
-        self.apply_behavior(target)
+        self.behavior(target)
         if self.passive:
             self.duration = self.duration_threshold
-            target.activate_ability(self)
+            # Ability calls Entity and requests to be applied
+            # The existence of this in target.abilities is guaranteed by the calling sequence
+            index = target.abilities.index(self);
+            target.activate_ability(index)
         self.cooldown = self.cooldown_threshold + 1 + self.cooldown_effect
 
 

@@ -3,32 +3,32 @@ from src.entity import Entity, Player
 
 
 def maths_behavior(target: Player):
-    target.get_attack().set_math(10)
+    target.attack.math = 10
 
 
 def maths_cancel_behavior(target: Player):
-    target.get_attack().set_math(0)
+    target.attack.math = 0
 
 
 def gift_behavior(target: Entity):
-    for ability in target.get_abilities():
-        ability.set_cooldown_effect(2)
+    for ability in target.abilities:
+        ability.cooldown_effect = 2
 
 
 def headphones_behavior(target: Player):
-    target.get_resists().set_phil(0.75)
+    target.resists.phil = 0.75
 
 
 def headphones_cancel_behavior(target: Player):
-    target.get_resists().set_phil(0.1)
+    target.resists.phil = 0.1
 
 
 def cigarette_behavior(target: Player):
-    ability_pool = [a for a in target.get_abilities() if a.get_level() <= 1 and not a.is_avalaible()]
+    ability_pool = [a for a in target.abilities if a.level == 1 and not a.is_avalaible()]
     print("Вы можете восстановить одну из следующих спосбоностей:")
     index = 1
     for ability in ability_pool:
-        print(index + '.', ability.get_name())
+        print(index + '.', ability.name)
         index += 1
     while True:
         try:
@@ -36,15 +36,15 @@ def cigarette_behavior(target: Player):
             break
         except ValueError:
             print("Попробуйте еще раз.")
-    target.get_abilities()[target.get_abilities().index(ability_pool[decision-1])].reset_cooldown()
+    target.abilities[target.abilities.index(ability_pool[decision-1])].cooldown = 0
 
 
 def adrenaline_behavior(target: Player):
-    ability_pool = [a for a in target.get_abilities() if a.get_level() <= 2 and not a.is_avalaible()]
+    ability_pool = [a for a in target.abilities if a.level == 2 and not a.is_avalaible()]
     print("Вы можете восстановить одну из следующих спосбоностей:")
     index = 1
     for ability in ability_pool:
-        print(index + '.', ability.get_name())
+        print(index + '.', ability.name)
         index += 1
     while True:
         try:
@@ -52,15 +52,15 @@ def adrenaline_behavior(target: Player):
             break
         except ValueError:
             print("Попробуйте еще раз.")
-    target.get_abilities()[target.get_abilities().index(ability_pool[decision-1])].reset_cooldown()
+    target.abilities[target.abilities.index(ability_pool[decision - 1])].cooldown = 0
 
 
 def drugs_behavior(target: Player):
-    ability_pool = [a for a in target.get_abilities() if a.get_level() <= 3 and not a.is_avalaible()]
+    ability_pool = [a for a in target.abilities if a.level == 3 and not a.is_avalaible()]
     print("Вы можете восстановить одну из следующих спосбоностей:")
     index = 1
     for ability in ability_pool:
-        print(index + '.', ability.get_name())
+        print(index + '.', ability.name)
         index += 1
     while True:
         try:
@@ -68,7 +68,7 @@ def drugs_behavior(target: Player):
             break
         except ValueError:
             print("Попробуйте еще раз.")
-    target.get_abilities()[target.get_abilities().index(ability_pool[decision-1])].reset_cooldown()
+    target.abilities[target.abilities.index(ability_pool[decision - 1])].cooldown = 0
 
 
 def tee_behavior(target: Player):
@@ -106,6 +106,7 @@ def crow_cancel_behavior(target: Player):
 phone_choice = ''
 
 
+# Might not work
 def phone_behavior(target: Player):
     print('''Вы можете увеличить один тип урона на 8. Выберите вид урона.
 1. Физический
@@ -115,31 +116,34 @@ def phone_behavior(target: Player):
     while True:
         decision = input('?: ')
         if decision is '1':
-            target.get_attack().set_phys(target.get_attack().get_phys() + 8)
+            target.attack.phys += 8
+            phone_choice = decision
             break
         elif decision is '2':
-            target.get_attack().set_math(target.get_attack().get_math() + 8)
+            target.attack.math += 8
+            phone_choice = decision
             break
         elif decision is '3':
-            target.get_attack().set_phil(target.get_attack().get_phil() + 8)
+            target.attack.phil += 8
+            phone_choice = decision
             break
         elif decision is '4':
-            target.get_attack().set_prog(target.get_attack().get_prog() + 8)
+            target.attack.prog += 8
+            phone_choice = decision
             break
         else:
             print("Попробуйте еще раз")
-    phone_choice = decision
 
 
 def phone_cancel_behavior(target: Player):
     if phone_choice is '1':
-        target.get_attack().set_phys(target.get_attack().get_phys() - 8)
+        target.attack.phys -= 8
     elif phone_choice is '2':
-        target.get_attack().set_math(target.get_attack().get_math() - 8)
+        target.attack.math -= 8
     elif phone_choice is '3':
-        target.get_attack().set_phil(target.get_attack().get_phil() - 8)
+        target.attack.phil -= 8
     elif phone_choice is '4':
-        target.get_attack().set_prog(target.get_attack().get_prog() - 8)
+        target.attack.prog -= 8
 
 
 def band_behavior(target: Player):
